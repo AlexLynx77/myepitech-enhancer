@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Epitech Enhancer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton:wght@400&family=IBM+Plex+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header Mantine Paper -->
+    <header class="header">
+      <div class="logo-area">
+        <div class="logo-badge">
+          <img src="logo.png" class="logo-img" alt="My Epitech" width="24" height="24">
+        </div>
+        <div class="logo-title">
+          <div class="logo-main-text">
+            <span class="logo-word-my">MY</span>
+            <span class="logo-word-epitech">EPITECH</span>
+          </div>
+          <span class="badge">Enhancer</span>
+        </div>
+      </div>
+      <label class="switch" title="Activer / Désactiver l'extension">
+        <input type="checkbox" id="toggle-enabled" checked>
+        <span class="slider"></span>
+      </label>
+    </header>
+
+    <!-- Status Banner -->
+    <div id="status-banner" class="status-banner">
+      <span class="status-dot"></span>
+      <span id="status-text">Détection de l'onglet en cours...</span>
+    </div>
+
+    <!-- Section: Options intelligentes -->
+    <section class="section">
+      <div class="section-title">Fonctionnalités</div>
+      
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-title">Statut d'inscription</div>
+          <div class="setting-desc">Badge d'inscription sur la page Modules</div>
+        </div>
+        <label class="switch" title="Activer / Désactiver les badges d'inscription">
+          <input type="checkbox" id="toggle-badges" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-title">Code module complet</div>
+          <div class="setting-desc">Affichage du code (ex: G-SEC-500) sur les projets</div>
+        </div>
+        <label class="switch" title="Activer / Désactiver les codes de module sur les projets">
+          <input type="checkbox" id="toggle-project-codes" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-title">Filtrer mes modules</div>
+          <div class="setting-desc">N'afficher que les projets de vos modules inscrits</div>
+        </div>
+        <label class="switch" title="Filtrer uniquement les projets des modules inscrits">
+          <input type="checkbox" id="toggle-filter-enrolled">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-title">Masquer mon identité</div>
+          <div class="setting-desc">Masquer le prénom et nom dans le bandeau supérieur</div>
+        </div>
+        <label class="switch" title="Masquer votre prénom et nom dans le bandeau supérieur">
+          <input type="checkbox" id="toggle-hide-user-name">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-title">Simulateur GPA</div>
+          <div class="setting-desc">Onglet d'estimation du GPA sur /me/academic</div>
+        </div>
+        <label class="switch" title="Activer / Désactiver le simulateur de GPA">
+          <input type="checkbox" id="toggle-gpa-simulator" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </section>
+
+    <!-- Section: Pagination -->
+    <section class="section">
+      <div class="section-header">
+        <label for="select-rows" class="section-title">Lignes par page (Modules)</label>
+      </div>
+      <div class="select-wrapper">
+        <select id="select-rows">
+          <option value="20">20 lignes (standard)</option>
+          <option value="30">30 lignes</option>
+          <option value="50" selected>50 lignes (recommandé)</option>
+          <option value="100">100 lignes</option>
+          <option value="150">150 lignes (tous les modules)</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Section: Colonnes -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-title">Colonnes affichées (Modules)</span>
+        <button id="btn-select-all" class="text-btn">Tout cocher</button>
+      </div>
+      <div id="columns-list" class="columns-grid">
+        <!-- Rempli dynamiquement par popup.js -->
+      </div>
+    </section>
+
+    <!-- Actions Footer -->
+    <footer class="footer">
+      <button id="btn-apply-now" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span>Appliquer</span>
+      </button>
+      <button id="btn-reset" class="btn btn-secondary" title="Réinitialiser les réglages par défaut">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+        </svg>
+        <span>Réinitialiser</span>
+      </button>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

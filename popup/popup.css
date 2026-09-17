@@ -1,0 +1,396 @@
+:root {
+  --epitech-page: #181818;
+  --epitech-surface: #1f1f1f;
+  --epitech-surface-strong: #141414;
+  --epitech-border: rgba(255, 255, 255, 0.10);
+  --epitech-border-hover: rgba(255, 255, 255, 0.22);
+  --epitech-muted: rgba(255, 255, 255, 0.55);
+  --epitech-muted-strong: rgba(255, 255, 255, 0.88);
+  --epitech-blue: #013afb;
+  --epitech-blue-light: #2a66ff;
+  --epitech-blue-hover: #0030df;
+  --epitech-blue-secondary: #809dfd;
+
+  --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'Space Mono', monospace;
+  --font-brand: 'Anton', 'IBM Plex Sans', sans-serif;
+  --radius-xs: 2px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 340px;
+  background-color: var(--epitech-page);
+  color: var(--epitech-muted-strong);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.45;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+.popup-container {
+  padding: 14px 16px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Header My Epitech */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--epitech-border);
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-badge {
+  width: 32px;
+  height: 32px;
+  background: var(--epitech-surface-strong);
+  border: 1px solid var(--epitech-border);
+  border-radius: var(--radius-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.logo-badge img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.logo-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-main-text {
+  font-family: var(--font-brand);
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  line-height: 1.1;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.logo-word-my {
+  color: #ffffff;
+}
+
+.logo-word-epitech {
+  color: var(--epitech-blue-light);
+}
+
+.badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--epitech-blue-secondary);
+  background: rgba(42, 102, 255, 0.14);
+  border: 1px solid rgba(42, 102, 255, 0.35);
+  border-radius: var(--radius-xs);
+  letter-spacing: 0.08em;
+  padding: 1px 6px;
+  margin-top: 2px;
+  align-self: flex-start;
+}
+
+/* Mantine Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--epitech-surface-strong);
+  transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 20px;
+  border: 1px solid var(--epitech-border);
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 2px;
+  bottom: 2px;
+  background-color: var(--epitech-muted);
+  transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--epitech-blue-light);
+  border-color: var(--epitech-blue-light);
+}
+
+input:checked + .slider:before {
+  transform: translateX(16px);
+  background-color: #ffffff;
+}
+
+/* Status Banner */
+.status-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--epitech-surface);
+  border: 1px solid var(--epitech-border);
+  color: var(--epitech-muted);
+  letter-spacing: 0.02em;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fab005;
+  flex-shrink: 0;
+}
+
+.status-banner.active {
+  background: rgba(0, 196, 117, 0.08);
+  border-color: rgba(0, 196, 117, 0.3);
+  color: #4bce88;
+}
+
+.status-banner.active .status-dot {
+  background: #00c475;
+  box-shadow: 0 0 6px rgba(0, 196, 117, 0.6);
+}
+
+/* Sections */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.section-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--epitech-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Setting Rows */
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  background: var(--epitech-surface);
+  border: 1px solid var(--epitech-border);
+  border-radius: var(--radius-xs);
+  transition: border-color 0.15s ease;
+}
+
+.setting-row:hover {
+  border-color: var(--epitech-border-hover);
+}
+
+.setting-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.setting-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.setting-desc {
+  font-size: 11px;
+  color: var(--epitech-muted);
+}
+
+.text-btn {
+  background: none;
+  border: none;
+  font-family: var(--font-mono);
+  color: var(--epitech-blue-secondary);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  padding: 0;
+}
+
+.text-btn:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+/* Select */
+.select-wrapper {
+  position: relative;
+}
+
+select {
+  width: 100%;
+  padding: 7px 12px;
+  background: var(--epitech-surface-strong);
+  border: 1px solid var(--epitech-border);
+  border-radius: var(--radius-xs);
+  color: var(--epitech-muted-strong);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23828282' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 13px;
+  transition: border-color 0.15s ease;
+}
+
+select:hover {
+  border-color: var(--epitech-border-hover);
+}
+
+select:focus {
+  border-color: var(--epitech-blue-light);
+}
+
+/* Columns Grid */
+.columns-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+
+.col-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 8px;
+  background: var(--epitech-surface);
+  border: 1px solid var(--epitech-border);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.col-item:hover {
+  background: var(--epitech-surface-strong);
+  border-color: var(--epitech-border-hover);
+}
+
+.col-item input[type="checkbox"] {
+  accent-color: var(--epitech-blue-light);
+  width: 13px;
+  height: 13px;
+  cursor: pointer;
+}
+
+.col-item span {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--epitech-muted-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Footer Buttons */
+.footer {
+  display: flex;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--epitech-border);
+}
+
+.btn {
+  padding: 7px 12px;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.btn-primary {
+  flex: 1;
+  background: var(--epitech-blue-light);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: var(--epitech-blue-hover);
+  box-shadow: 0 2px 8px rgba(1, 58, 251, 0.4);
+}
+
+.btn-secondary {
+  background: var(--epitech-surface-strong);
+  color: var(--epitech-muted);
+  border-color: var(--epitech-border);
+}
+
+.btn-secondary:hover {
+  background: var(--epitech-surface);
+  border-color: var(--epitech-border-hover);
+  color: #ffffff;
+}
+

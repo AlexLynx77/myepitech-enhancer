@@ -1,0 +1,784 @@
+/* Toast notifications for MyEpitech Enhancer (Mantine Notification style) */
+.myepitech-toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.myepitech-toast {
+  background: var(--mantine-color-dark-6, #25262b);
+  color: var(--mantine-color-text, #c1c2c5);
+  border: 1px solid var(--mantine-color-dark-4, #373a40);
+  border-radius: var(--mantine-radius-md, 8px);
+  padding: 9px 14px;
+  font-size: 12.5px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  transform: translateY(8px);
+  opacity: 0;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+  pointer-events: auto;
+}
+
+.myepitech-toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.myepitech-toast-icon {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mantine-color-blue-4, #4dabf7);
+  flex-shrink: 0;
+}
+
+/* Class to silence/hide column popover during auto-sync */
+.myepitech-silent-sync {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Badges de statut d'inscription au module (Charte Epitech Mantine) */
+.myepitech-enroll-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 2px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-right: 8px;
+  flex-shrink: 0;
+  user-select: none;
+  vertical-align: middle;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.myepitech-enroll-badge:hover {
+  transform: scale(1.03);
+}
+
+.myepitech-enroll-badge.enrolled {
+  background: rgba(0, 196, 117, 0.14);
+  color: #00c475;
+  border: 1px solid rgba(0, 196, 117, 0.45);
+}
+
+.myepitech-enroll-badge.open {
+  background: rgba(42, 102, 255, 0.14);
+  color: #809dfd;
+  border: 1px solid rgba(42, 102, 255, 0.4);
+}
+
+.myepitech-enroll-badge.closed {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Badges du code de module sur les cartes de projets */
+.myepitech-project-code-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(42, 102, 255, 0.14);
+  color: #809dfd;
+  border: 1px solid rgba(42, 102, 255, 0.35);
+  border-radius: 2px;
+  padding: 2px 6px;
+  margin-right: 6px;
+  user-select: none;
+  vertical-align: middle;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.myepitech-project-code-badge:hover {
+  background: rgba(42, 102, 255, 0.22);
+  border-color: rgba(42, 102, 255, 0.55);
+}
+
+.myepitech-project-code-badge.enrolled {
+  background: rgba(0, 196, 117, 0.14);
+  color: #00c475;
+  border-color: rgba(0, 196, 117, 0.45);
+}
+
+.myepitech-project-code-badge.enrolled:hover {
+  background: rgba(46, 160, 67, 0.28);
+  border-color: rgba(46, 160, 67, 0.6);
+}
+
+/* Carte de projet masquée lors du filtrage */
+.myepitech-project-card-hidden {
+  display: none !important;
+}
+
+/* Barre de filtrage des projets */
+.myepitech-projects-filter-bar {
+  display: flex !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+  margin-top: 14px;
+  padding: 10px 16px;
+  background: var(--epitech-surface, #1f1f1f) !important;
+  border: 1px solid var(--epitech-border, rgba(255, 255, 255, 0.10)) !important;
+  border-radius: 2px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  user-select: none;
+  z-index: 50;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+}
+
+.myepitech-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.myepitech-segmented-control {
+  display: inline-flex;
+  align-items: center;
+  background: var(--epitech-surface-strong, #141414);
+  border: 1px solid var(--epitech-border, rgba(255, 255, 255, 0.10));
+  border-radius: 2px;
+  padding: 3px;
+  gap: 3px;
+}
+
+.myepitech-seg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--epitech-muted, rgba(255, 255, 255, 0.55));
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 5px 12px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1.3;
+}
+
+.myepitech-seg-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.myepitech-seg-btn.active {
+  background: #2a66ff;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.myepitech-seg-icon {
+  flex-shrink: 0;
+}
+
+.myepitech-pill-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #909296;
+  min-width: 18px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.myepitech-seg-btn.active .myepitech-pill-count {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+.myepitech-filter-info {
+  font-size: 12px;
+  color: #909296;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.myepitech-filter-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #a5d8ff;
+  background: rgba(25, 113, 194, 0.12);
+  border: 1px solid rgba(25, 113, 194, 0.3);
+  border-radius: 6px;
+  padding: 4px 10px;
+}
+
+.myepitech-filter-sync-link {
+  color: #4dabf7;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.myepitech-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #141517;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 6px 12px;
+  color: #909296;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.myepitech-refresh-btn:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.myepitech-refresh-btn.spinning svg {
+  animation: myepitech-spin 0.8s linear infinite;
+}
+
+@keyframes myepitech-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.myepitech-filter-sync-link:hover {
+  color: #74c0fc;
+}
+
+.myepitech-no-projects-msg {
+  grid-column: 1 / -1;
+  background: rgba(26, 27, 30, 0.5);
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 36px 20px;
+  text-align: center;
+  color: #909296;
+  font-size: 14px;
+}
+
+.myepitech-no-projects-msg p {
+  margin: 0 0 12px 0;
+}
+
+.myepitech-btn-reset-filter {
+  background: rgba(25, 113, 194, 0.18);
+  border: 1px solid rgba(25, 113, 194, 0.4);
+  color: #74c0fc;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.myepitech-btn-reset-filter:hover {
+  background: #1971c2;
+  color: #fff;
+}
+
+/* ==========================================================================
+   Masquage du prénom et nom de l'étudiant dans l'en-tête (Header)
+   ========================================================================== */
+html.myepitech-hide-user-name header button[aria-haspopup="menu"] .mantine-Text-root,
+html.myepitech-hide-user-name header .mantine-Menu-target .mantine-Text-root,
+html.myepitech-hide-user-name header button[aria-haspopup="menu"] > div > span:not(.mantine-Avatar-root),
+html.myepitech-hide-user-name header button[aria-haspopup="menu"] > span:not(.mantine-Avatar-root),
+body.myepitech-hide-user-name header button[aria-haspopup="menu"] .mantine-Text-root,
+body.myepitech-hide-user-name header .mantine-Menu-target .mantine-Text-root,
+body.myepitech-hide-user-name header button[aria-haspopup="menu"] > div > span:not(.mantine-Avatar-root),
+body.myepitech-hide-user-name header button[aria-haspopup="menu"] > span:not(.mantine-Avatar-root) {
+  display: none !important;
+}
+
+/* ==========================================================================
+   SIMULATEUR DE GPA & PARCOURS ACADÉMIQUE (/me/academic)
+   ========================================================================== */
+
+/* Bouton intégré dans la barre de navigation personnalisée de MyEpitech */
+.myepitech-gpa-nav-btn {
+  border-bottom: 2px solid transparent !important;
+  transition: color 0.15s, background-color 0.15s, border-color 0.15s !important;
+  overflow: hidden !important;
+  z-index: 2 !important;
+  padding: 6px 12px !important;
+  color: var(--mantine-color-dimmed, #8b949e) !important;
+  text-align: center !important;
+  text-transform: none !important;
+  min-width: 0rem !important;
+  position: relative !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+}
+
+.myepitech-gpa-nav-btn:hover {
+  background: var(--mantine-color-default-hover, rgba(255, 255, 255, 0.06)) !important;
+  color: var(--mantine-color-text, #ffffff) !important;
+}
+
+.myepitech-gpa-nav-btn.active {
+  border-bottom: 2px solid var(--mantine-color-blue-6, #58a6ff) !important;
+  background: var(--mantine-color-default-hover, rgba(56, 139, 253, 0.14)) !important;
+  color: var(--mantine-color-text, #ffffff) !important;
+}
+
+/* Panneau principal du simulateur (Design Mantine / MyEpitech) */
+.myepitech-gpa-simulator-panel {
+  background: var(--mantine-color-body, #1a1b1e);
+  border: 1px solid var(--mantine-color-dark-4, #373a40);
+  border-radius: var(--mantine-radius-md, 8px);
+  padding: 20px;
+  margin-top: 14px;
+  margin-bottom: 32px;
+  font-family: inherit;
+  color: var(--mantine-color-text, #c1c2c5);
+}
+
+/* En-tête du panneau */
+.myepitech-gpa-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--mantine-color-dark-4, #2c2e33);
+  margin-bottom: 20px;
+}
+
+.myepitech-gpa-title-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.myepitech-gpa-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--mantine-color-white, #ffffff);
+  letter-spacing: -0.2px;
+}
+
+.myepitech-gpa-semester-badge {
+  background: var(--mantine-color-dark-5, #2c2e33);
+  color: var(--mantine-color-blue-4, #4dabf7);
+  border: 1px solid var(--mantine-color-dark-4, #373a40);
+  padding: 3px 10px;
+  border-radius: var(--mantine-radius-xl, 32px);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.myepitech-gpa-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.myepitech-gpa-select {
+  background: var(--mantine-color-dark-6, #25262b);
+  border: 1px solid var(--mantine-color-dark-4, #373a40);
+  color: var(--mantine-color-text, #c1c2c5);
+  padding: 6px 12px;
+  border-radius: var(--mantine-radius-sm, 4px);
+  font-size: 12px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.myepitech-gpa-select:hover,
+.myepitech-gpa-select:focus {
+  border-color: var(--mantine-color-dark-3, #5c5f66);
+}
+
+.myepitech-gpa-btn-icon {
+  background: var(--mantine-color-dark-6, #25262b);
+  border: 1px solid var(--mantine-color-dark-4, #373a40);
+  color: var(--mantine-color-text, #c1c2c5);
+  padding: 6px 12px;
+  border-radius: var(--mantine-radius-sm, 4px);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.myepitech-gpa-btn-icon:hover {
+  background: var(--mantine-color-dark-5, #2c2e33);
+  border-color: var(--mantine-color-dark-3, #5c5f66);
+  color: #ffffff;
+}
+
+.myepitech-preset-btn.reset {
+  background: rgba(250, 82, 82, 0.12);
+  border: 1px solid rgba(250, 82, 82, 0.35);
+  color: #ff8787;
+  padding: 6px 12px;
+  border-radius: var(--mantine-radius-sm, 4px);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.myepitech-preset-btn.reset:hover {
+  background: rgba(250, 82, 82, 0.22);
+  border-color: #fa5252;
+}
+
+/* Grille de KPI (Mantine Paper style) */
+.myepitech-gpa-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.myepitech-gpa-kpis-compact {
+  max-width: 580px;
+}
+
+.myepitech-gpa-kpi-card {
+  background: var(--mantine-color-dark-6, #25262b);
+  border: 1px solid var(--mantine-color-dark-4, #373a40);
+  border-radius: var(--mantine-radius-md, 8px);
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.15s ease;
+}
+
+.myepitech-gpa-kpi-card.highlight {
+  border: 1px solid var(--mantine-color-blue-6, #228be6);
+  border-left: 4px solid var(--mantine-color-blue-6, #228be6);
+}
+
+.myepitech-gpa-kpi-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--mantine-color-dimmed, #909296);
+  font-weight: 700;
+}
+
+.myepitech-gpa-kpi-val {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--mantine-color-white, #ffffff);
+  margin: 4px 0 2px 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.myepitech-gpa-kpi-val.accent {
+  color: var(--mantine-color-blue-4, #4dabf7);
+}
+
+.myepitech-gpa-kpi-sub {
+  font-size: 12px;
+  color: var(--mantine-color-dimmed, #909296);
+  margin-top: 2px;
+}
+
+/* Badges Delta GPA (Mantine Badge) */
+.myepitech-gpa-delta-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--mantine-radius-sm, 4px);
+  line-height: 1.2;
+}
+
+.myepitech-gpa-delta-badge.delta-positive {
+  background: rgba(64, 192, 87, 0.15);
+  color: #51cf66;
+  border: 1px solid rgba(81, 207, 102, 0.35);
+}
+
+.myepitech-gpa-delta-badge.delta-negative {
+  background: rgba(250, 82, 82, 0.15);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.35);
+}
+
+.myepitech-gpa-delta-badge.delta-neutral {
+  background: var(--mantine-color-dark-5, #2c2e33);
+  color: var(--mantine-color-dimmed, #909296);
+  border: 1px solid var(--mantine-color-dark-4, #373a40);
+}
+
+/* Tableau interactif épuré (Mantine Table) */
+.myepitech-gpa-table-wrapper {
+  background: var(--mantine-color-dark-7, #141517);
+  border: 1px solid var(--mantine-color-dark-4, #373a40);
+  border-radius: var(--mantine-radius-md, 8px);
+  overflow: hidden;
+}
+
+.myepitech-gpa-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.myepitech-gpa-table thead tr {
+  background: var(--mantine-color-dark-6, #25262b);
+  border-bottom: 1px solid var(--mantine-color-dark-4, #373a40);
+}
+
+.myepitech-gpa-table th {
+  padding: 10px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--mantine-color-dimmed, #909296);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.myepitech-gpa-table tbody tr {
+  border-bottom: 1px solid var(--mantine-color-dark-5, #2c2e33);
+  transition: background 0.12s ease;
+}
+
+.myepitech-gpa-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.myepitech-gpa-table tbody tr:hover {
+  background: var(--mantine-color-dark-6, #25262b);
+}
+
+.myepitech-gpa-table td {
+  padding: 11px 16px;
+  vertical-align: middle;
+}
+
+.myepitech-gpa-module-code {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--mantine-color-blue-4, #4dabf7);
+  line-height: 1.3;
+}
+
+.myepitech-gpa-module-name {
+  font-size: 12px;
+  color: var(--mantine-color-dimmed, #909296);
+  margin-top: 2px;
+}
+
+.myepitech-ects-badge {
+  background: var(--mantine-color-dark-6, #25262b);
+  color: var(--mantine-color-dark-0, #c1c2c5);
+  border: 1px solid var(--mantine-color-dark-4, #373a40);
+  padding: 2px 8px;
+  border-radius: var(--mantine-radius-sm, 4px);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Sélecteur déroulant de grade (Mantine Select) */
+.myepitech-grade-select {
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 12px;
+  text-align: center;
+  padding: 5px 24px 5px 12px;
+  border-radius: var(--mantine-radius-sm, 4px);
+  cursor: pointer;
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  background-size: 10px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23909296'%3E%3Cpath d='M4.427 6.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 6H4.604a.25.25 0 00-.177.427z'/%3E%3C/svg%3E");
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+.myepitech-grade-select option {
+  background: var(--mantine-color-dark-7, #141517);
+  color: var(--mantine-color-text, #c1c2c5);
+}
+
+.myepitech-grade-select:hover {
+  filter: brightness(1.15);
+}
+
+.myepitech-grade-select:focus {
+  border-color: var(--mantine-color-blue-6, #228be6);
+}
+
+/* Thèmes de couleur des notes (Mantine palette) */
+.grade-A {
+  background-color: rgba(64, 192, 87, 0.15);
+  color: #51cf66;
+  border: 1px solid rgba(81, 207, 102, 0.4);
+}
+
+.grade-B {
+  background-color: rgba(51, 154, 240, 0.15);
+  color: #4dabf7;
+  border: 1px solid rgba(77, 171, 247, 0.4);
+}
+
+.grade-C {
+  background-color: rgba(252, 196, 25, 0.15);
+  color: #fcc419;
+  border: 1px solid rgba(252, 196, 25, 0.4);
+}
+
+.grade-D {
+  background-color: rgba(255, 146, 43, 0.15);
+  color: #ff922b;
+  border: 1px solid rgba(255, 146, 43, 0.4);
+}
+
+.grade-Fail {
+  background-color: rgba(250, 82, 82, 0.15);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.4);
+}
+
+.grade-none {
+  background-color: var(--mantine-color-dark-6, #25262b);
+  color: var(--mantine-color-dimmed, #909296);
+  border: 1px solid var(--mantine-color-dark-4, #373a40);
+}
+
+.myepitech-gpa-empty {
+  text-align: center;
+  padding: 32px !important;
+  color: var(--mantine-color-dimmed, #909296);
+  font-style: italic;
+}
+
+/* Spinner de chargement (Mantine Loader) */
+.myepitech-gpa-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  gap: 14px;
+  color: var(--mantine-color-dimmed, #909296);
+  font-size: 13px;
+}
+
+.myepitech-gpa-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--mantine-color-dark-4, #373a40);
+  border-top-color: var(--mantine-color-blue-6, #228be6);
+  border-radius: 50%;
+  animation: myepitech-spin 0.7s linear infinite;
+}
+
+@keyframes myepitech-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Carte d'erreur (Mantine Alert / Paper style) */
+.myepitech-gpa-error {
+  background: rgba(250, 82, 82, 0.08);
+  border: 1px solid rgba(250, 82, 82, 0.3);
+  border-radius: var(--mantine-radius-md, 8px);
+  padding: 16px 20px;
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.myepitech-gpa-error-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: #ff8787;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.myepitech-gpa-error-msg {
+  font-size: 13px;
+  color: var(--mantine-color-dark-0, #c1c2c5);
+}
+
+.myepitech-gpa-error-actions {
+  margin-top: 4px;
+}
+
+.myepitech-gpa-retry-btn {
+  background: var(--mantine-color-dark-6, #25262b);
+  border: 1px solid var(--mantine-color-dark-4, #373a40);
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: var(--mantine-radius-sm, 4px);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.myepitech-gpa-retry-btn:hover {
+  background: var(--mantine-color-dark-5, #2c2e33);
+  border-color: var(--mantine-color-blue-6, #228be6);
+  color: var(--mantine-color-blue-4, #4dabf7);
+}
+
+
+
