@@ -185,6 +185,145 @@
 
   const academicDataCacheMap = new Map();
 
+  const NAME_STOPWORDS = new Set(['of', 'the', 'and', 'in', 'de', 'la', 'le', 'les', 'et']);
+
+  // Retire le préfixe de niveau ("G3 - ") d'un nom de module
+  const normalizeUnitName = (name) => String(name || '').toLowerCase().replace(/^[a-z]\d\s*-\s*/, '').trim();
+
+  const nameTokens = (name) => new Set(
+    normalizeUnitName(name).split(/[^a-z0-9]+/).filter((t) => t && !NAME_STOPWORDS.has(t))
+  );
+
+  /**
+   * Un module correspond à une UE si les mots de leurs noms sont identiques ("End of Year Project" = "Year-End Project")
+   * ou si le nom du module commence par celui de l'UE ("Skill Booster: Professional Development").
+   */
+  function unitNameMatchesBlock(unitName, blockTitle) {
+    const unit = normalizeUnitName(unitName);
+    const title = normalizeUnitName(blockTitle);
+    if (!unit || !title) return false;
+    if (unit.startsWith(title + ':') || unit.startsWith(title + ' -')) return true;
+    const a = nameTokens(unitName);
+    const b = nameTokens(blockTitle);
+    return a.size > 0 && a.size === b.size && [...a].every((t) => b.has(t));
+  }
+
+  /**
+   * Associe chaque bloc UE (onglet Compétences) à son module.
+   * Les crédits sont portés par l'UE, pas par le module : chaque UE a en pratique un module « propriétaire ».
+   * - Graphe de validation (module → projet/activité → compétence → bloc) : une UE alimentée par un seul module
+   *   en est le propriétaire ; une UE alimentée par plusieurs modules est transversale (aucun propriétaire).
+   * - UE absente du graphe (ou transversale) : rapprochement par nom, retenu uniquement si le résultat est unique.
+   * Seuls les modules où l'étudiant est inscrit sont retournés : une UE sans module inscrit
+   * (modules vide et transversal à false) n'est pas suivie par l'étudiant.
+   * @returns {Object<string, {modules: Array, transversal: boolean}>} blockId → modules { unitCode, instanceCode, schoolYear, name, inferred }
+   */
+  async function fetchBlockModules(apiContext, validations) {
+    const result = {};
+    try {
+      const blocks = (validations && validations.blocks) || [];
+      const semesterId = validations && (validations.viewedSemesterId || validations.semesterId);
+      if (!blocks.length || !semesterId || !apiContext.evaluations || !apiContext.units) return result;
+
+      const semInfo = (validations.attendedSemesters || []).find((s) => String(s.semesterId) === String(semesterId));
+      const schoolYear = semInfo ? Number(semInfo.schoolYear) : null;
+
+      const [graphRes, unitsRes] = await Promise.all([
+        apiContext.evaluations.getMyValidationGraph({ semesterId: Number(semesterId) }).catch(() => null),
+        schoolYear
+          ? apiContext.units.getAllUnitInstances({ schoolYear, expanded: false }).catch(() => null)
+          : Promise.resolve(null)
+      ]);
+
+      // Index des modules de l'année (un module = un code, on privilégie l'instance où l'étudiant est inscrit)
+      const unitIndex = {};
+      const unitItems = unitsRes ? (unitsRes.data || unitsRes) : [];
+      (Array.isArray(unitItems) ? unitItems : []).forEach((u) => {
+        const code = String(u.unitCode || '').toUpperCase().trim();
+        if (!code) return;
+        const known = unitIndex[code];
+        if (!known || (u.isRegistered && !known.isRegistered)) {
+          unitIndex[code] = {
+            instanceCode: u.code,
+            name: u.name,
+            isRegistered: Boolean(u.isRegistered),
+            schoolYear: u.schoolYear || schoolYear
+          };
+        }
+      });
+
+      const graph = graphRes ? (graphRes.data || graphRes) : null;
+      const nodes = (graph && graph.nodes) || [];
+      const links = (graph && graph.links) || [];
+      const nodesById = {};
+      nodes.forEach((n) => { nodesById[n.id] = n; });
+
+      const skillToBlock = {};
+      links.forEach((l) => {
+        if (l.kind === 'skill_block') skillToBlock[l.source] = l.target;
+      });
+
+      const unitsByBlock = {};
+      const addUnit = (blockNodeId, unitCode, instanceCode, year) => {
+        const code = String(unitCode || '').toUpperCase().trim();
+        if (!blockNodeId || !code) return;
+        const map = unitsByBlock[blockNodeId] || (unitsByBlock[blockNodeId] = {});
+        if (!map[code] || (!map[code].instanceCode && instanceCode)) {
+          map[code] = { instanceCode: instanceCode || null, schoolYear: year || null };
+        }
+      };
+
+      links.forEach((l) => {
+        if (l.kind !== 'project_skill' && l.kind !== 'activity_skill') return;
+        const blockNodeId = skillToBlock[l.target];
+        const source = nodesById[l.source];
+        if (!blockNodeId || !source) return;
+        if (source.kind === 'project' && source.meta) {
+          addUnit(blockNodeId, source.meta.unitCode, source.meta.unitInstanceCode, source.meta.schoolYear);
+        } else if (source.kind === 'other_eval' && source.otherEvalMeta) {
+          (source.otherEvalMeta.activities || []).forEach((a) => addUnit(blockNodeId, a.unitCode, null, a.schoolYear));
+        }
+      });
+
+      const toEntry = (code, extra, inferred) => {
+        const info = unitIndex[code] || {};
+        return {
+          unitCode: code,
+          instanceCode: (extra && extra.instanceCode) || info.instanceCode || null,
+          schoolYear: (extra && extra.schoolYear) || info.schoolYear || schoolYear,
+          name: info.name || code,
+          inferred: Boolean(inferred)
+        };
+      };
+      const isRegistered = (code) => Boolean(unitIndex[code] && unitIndex[code].isRegistered);
+
+      blocks.forEach((b) => {
+        const linked = unitsByBlock['block:' + b.id] || {};
+        const linkedCodes = Object.keys(linked);
+
+        if (linkedCodes.length === 1) {
+          const code = linkedCodes[0];
+          result[b.id] = {
+            modules: isRegistered(code) ? [toEntry(code, linked[code], false)] : [],
+            transversal: false
+          };
+          return;
+        }
+
+        // UE absente du graphe ou transversale : rapprochement par nom parmi les modules inscrits
+        const pool = linkedCodes.length > 1 ? linkedCodes : Object.keys(unitIndex);
+        const matches = pool.filter((code) => isRegistered(code) && unitNameMatchesBlock(unitIndex[code].name, b.title));
+        result[b.id] = {
+          modules: matches.length === 1 ? [toEntry(matches[0], linked[matches[0]], true)] : [],
+          transversal: matches.length !== 1 && linkedCodes.length > 1 && linkedCodes.some(isRegistered)
+        };
+      });
+    } catch (e) {
+      console.warn('[MyEpitech Bridge] Erreur lors du rapprochement blocs/modules :', e);
+    }
+    return result;
+  }
+
   /**
    * Récupère le parcours académique, les validations et le profil GPA en parallèle
    */
@@ -298,11 +437,16 @@
       }
     }
 
+    const blockModules = (apiContext && validationsData && validationsData.blocks)
+      ? await fetchBlockModules(apiContext, validationsData)
+      : {};
+
     const finalResult = {
       validations: validationsData,
       credits: creditsData,
       user: userData,
       profile: profileData,
+      blockModules,
       timestamp: Date.now()
     };
 

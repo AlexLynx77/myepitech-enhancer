@@ -348,8 +348,9 @@
     toast.className = 'myepitech-toast';
     toast.innerHTML = `
       <span class="myepitech-toast-icon">${iconHtml}</span>
-      <span class="myepitech-toast-text">${message}</span>
+      <span class="myepitech-toast-text"></span>
     `;
+    toast.querySelector('.myepitech-toast-text').textContent = message;
 
     toastContainer.appendChild(toast);
     requestAnimationFrame(() => {
@@ -378,8 +379,7 @@
   }
 
   function isAcademicPage() {
-    const p = window.location.pathname;
-    return p.includes('academic');
+    return window.location.pathname.includes('/me/academic');
   }
 
   /**
@@ -1387,9 +1387,19 @@
       return [];
     }
     const blocks = academicDataCache.validations.blocks;
+    const blockModules = academicDataCache.blockModules;
+    // Sans données de rattachement (API indisponible), on ne filtre pas plutôt que de tout masquer
+    const canFilterByModules = Boolean(blockModules) && Object.keys(blockModules).length > 0;
+
     return blocks.filter((b) => {
       // Ignorer uniquement les UEs non concernées sans opportunité ni note
       if (b.hasOpportunity === false && (!b.grade || b.grade === '-')) return false;
+
+      // Ignorer les UEs dont aucun module n'est dans les inscriptions de l'étudiant
+      if (canFilterByModules) {
+        const entry = blockModules[b.id];
+        if (!entry || (entry.modules.length === 0 && !entry.transversal)) return false;
+      }
       return true;
     });
   }
@@ -1414,15 +1424,10 @@
     }
 
     // 2. Crédits acquis historiques avant ce semestre
-    let totalAcquiredCredits = Number(academicDataCache?.validations?.totalAcquiredCredits || academicDataCache?.credits?.totalAcquiredCredits);
-    if (!totalAcquiredCredits || isNaN(totalAcquiredCredits)) {
-      const scolariteText = document.body.innerText || '';
-      const matchCredits = scolariteText.match(/cr[eé]dits\s*[:\s]?\s*(\d+)/i);
-      if (matchCredits) {
-        totalAcquiredCredits = parseInt(matchCredits[1], 10);
-      } else {
-        totalAcquiredCredits = 125;
-      }
+    let totalAcquiredCredits = Number(academicDataCache?.credits?.totalAcquiredCredits ?? academicDataCache?.validations?.totalAcquiredCredits);
+    if (isNaN(totalAcquiredCredits)) {
+      const validations = academicDataCache?.validations;
+      totalAcquiredCredits = (Number(validations?.acquiredCredits) || 0) + (Number(validations?.priorCredits) || 0);
     }
 
     // Soustraire uniquement les crédits de ce semestre qui sont déjà officiellement acquis / validés
@@ -1505,6 +1510,7 @@
     const panel = document.getElementById('myepitech-gpa-simulator-container');
     if (panel) panel.remove();
 
+    document.querySelectorAll('.myepitech-gpa-tabs-active').forEach((el) => el.classList.remove('myepitech-gpa-tabs-active'));
     document.querySelectorAll('[data-gpa-hidden="true"]').forEach((el) => {
       el.removeAttribute('data-gpa-hidden');
       el.style.display = '';
@@ -1513,16 +1519,19 @@
     isGpaTabActive = false;
   }
 
+  /**
+   * L'état visuel des onglets passe uniquement par la classe `myepitech-gpa-tabs-active` posée sur la barre
+   * (voir content.css) : les onglets natifs, gérés par React, ne sont jamais modifiés directement.
+   */
   function deactivateGpaTab() {
     isGpaTabActive = false;
     const tabBtn = document.getElementById('myepitech-gpa-tab-btn');
     if (tabBtn) {
       tabBtn.classList.remove('active');
       tabBtn.removeAttribute('aria-current');
-      tabBtn.style.borderBottom = '2px solid transparent';
-      tabBtn.style.background = 'transparent';
-      tabBtn.style.color = 'var(--mantine-color-dimmed, #8b949e)';
     }
+
+    document.querySelectorAll('.myepitech-gpa-tabs-active').forEach((el) => el.classList.remove('myepitech-gpa-tabs-active'));
 
     const panel = document.getElementById('myepitech-gpa-simulator-container');
     if (panel) panel.style.display = 'none';
@@ -1537,24 +1546,12 @@
     isGpaTabActive = true;
     const navBar = findAcademicNavBar();
 
-    if (navBar) {
-      Array.from(navBar.querySelectorAll('button')).forEach((btn) => {
-        if (btn.id !== 'myepitech-gpa-tab-btn') {
-          btn.removeAttribute('aria-current');
-          btn.style.borderBottom = '2px solid transparent';
-          btn.style.background = 'transparent';
-          btn.style.color = 'var(--mantine-color-dimmed, #8b949e)';
-        }
-      });
-    }
+    if (navBar) navBar.classList.add('myepitech-gpa-tabs-active');
 
     const tabBtn = document.getElementById('myepitech-gpa-tab-btn');
     if (tabBtn) {
       tabBtn.classList.add('active');
       tabBtn.setAttribute('aria-current', 'page');
-      tabBtn.style.borderBottom = '2px solid var(--mantine-color-blue-6, #58a6ff)';
-      tabBtn.style.background = 'var(--mantine-color-default-hover, rgba(56, 139, 253, 0.12))';
-      tabBtn.style.color = 'var(--mantine-color-text, #ffffff)';
     }
 
     const stack = navBar ? navBar.parentElement : document.querySelector('.mantine-AppShell-main');
@@ -1595,6 +1592,27 @@
     if (grade === 'D') return 'grade-D';
     if (grade === 'E' || grade === 'Fail') return 'grade-Fail';
     return 'grade-none';
+  }
+
+  /**
+   * Pastilles des modules (code + lien vers la fiche) qui alimentent un bloc UE
+   */
+  function renderModuleChips(entry) {
+    const modules = (entry && entry.modules) || [];
+    if (modules.length === 0) {
+      const text = entry && entry.transversal ? 'UE transversale (plusieurs modules)' : 'Aucun module inscrit rattaché';
+      return `<span class="myepitech-gpa-module-none">${text}</span>`;
+    }
+    return modules.map((mod) => {
+      const title = escapeHtml(mod.inferred ? 'Module rapproché par le nom (non officiel)' : 'Ouvrir la fiche du module');
+      const label = `<strong>${escapeHtml(mod.unitCode)}</strong> ${escapeHtml(mod.name)}`;
+
+      if (!mod.schoolYear || !mod.instanceCode) {
+        return `<span class="myepitech-module-chip" title="${title}">${label}</span>`;
+      }
+      const href = `/units/${encodeURIComponent(mod.schoolYear)}/${encodeURIComponent(mod.unitCode)}/${encodeURIComponent(mod.instanceCode)}`;
+      return `<a class="myepitech-module-chip" href="${href}" title="${title}">${label}</a>`;
+    }).join('');
   }
 
   function renderGpaSimulator() {
@@ -1642,6 +1660,7 @@
 
     const modules = getEnrolledModulesList();
     const stats = calculateGpaStats();
+    const blockModules = academicDataCache.blockModules || {};
 
     const semName = academicDataCache.validations.semester ? `Semestre B${academicDataCache.validations.semester}` : 'Semestre Actuel';
     const attendedSemesters = academicDataCache.validations.attendedSemesters || [];
@@ -1724,6 +1743,7 @@
                   <td>
                     <div class="myepitech-gpa-module-code">${escapeHtml(m.title || 'UE')}</div>
                     <div class="myepitech-gpa-module-name">${escapeHtml(m.titleFr || m.title || '')}</div>
+                    <div class="myepitech-gpa-module-links">${renderModuleChips(blockModules[m.id])}</div>
                   </td>
                   <td style="text-align: center;">
                     <span class="myepitech-ects-badge">${credits} ECTS</span>
@@ -1835,11 +1855,15 @@
 
       navBar.appendChild(tabBtn);
 
-      navBar.addEventListener('click', (e) => {
-        if (!e.target.closest('#myepitech-gpa-tab-btn')) {
-          deactivateGpaTab();
-        }
-      });
+      // La barre survit à la recréation du bouton : un seul écouteur suffit
+      if (!navBar.dataset.myepitechGpaListener) {
+        navBar.dataset.myepitechGpaListener = 'true';
+        navBar.addEventListener('click', (e) => {
+          if (!e.target.closest('#myepitech-gpa-tab-btn')) {
+            deactivateGpaTab();
+          }
+        });
+      }
     }
 
     if (!academicDataCache) {
@@ -1877,20 +1901,9 @@
       }
     };
 
+    // pushState/replaceState sont interceptés par bridge.js (monde MAIN), qui émet __MYEPITECH_ROUTE_CHANGE__
     window.addEventListener('popstate', checkUrlChange);
     window.addEventListener('__MYEPITECH_ROUTE_CHANGE__', checkUrlChange);
-
-    const origPushState = history.pushState;
-    history.pushState = function (...args) {
-      origPushState.apply(this, args);
-      checkUrlChange();
-    };
-
-    const origReplaceState = history.replaceState;
-    history.replaceState = function (...args) {
-      origReplaceState.apply(this, args);
-      checkUrlChange();
-    };
 
     // Observateur pour détecter l'apparition du tableau et les cartes de projets
     let domDebounce = null;
@@ -2028,28 +2041,6 @@
   setupNavigationObserver();
 
   const init = async () => {
-    // Nettoyage immédiat au démarrage des données obsolètes résiduelles (ex: G-CNA-500)
-    chrome.storage.local.get([ENROLLED_MODULES_KEY], (res) => {
-      const data = res && res[ENROLLED_MODULES_KEY];
-      if (data && data.years) {
-        let changed = false;
-        for (const y of Object.keys(data.years)) {
-          if (data.years[y] && data.years[y].includes('G-CNA-500')) {
-            data.years[y] = data.years[y].filter((c) => c !== 'G-CNA-500');
-            changed = true;
-          }
-        }
-        if (changed) {
-          const allSet = new Set();
-          Object.values(data.years).forEach((list) => {
-            if (Array.isArray(list)) list.forEach((c) => allSet.add(c));
-          });
-          data.allCodes = Array.from(allSet);
-          chrome.storage.local.set({ [ENROLLED_MODULES_KEY]: data });
-        }
-      }
-    });
-
     const settings = await getSettings();
     if (!settings.enabled) {
       applyUserNameVisibility(false);
