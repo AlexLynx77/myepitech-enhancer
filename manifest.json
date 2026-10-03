@@ -5,8 +5,7 @@
   "description": "Améliorations d'interface pour My Epitech : pagination, colonnes, filtres de projets et badges des modules.",
   "permissions": [
     "storage",
-    "activeTab",
-    "tabs"
+    "activeTab"
   ],
   "host_permissions": [
     "https://my.epitech.eu/*"

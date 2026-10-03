@@ -296,6 +296,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (toggleProjectCodes) toggleProjectCodes.checked = true;
       if (toggleFilterEnrolled) toggleFilterEnrolled.checked = false;
       if (toggleHideUserName) toggleHideUserName.checked = false;
+      if (toggleGpaSimulator) toggleGpaSimulator.checked = true;
       selectRows.value = '50';
       renderColumns(columnsList);
       if (activeTab && activeTab.id) {

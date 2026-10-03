@@ -370,6 +370,18 @@ body.myepitech-hide-user-name header button[aria-haspopup="menu"] > span:not(.ma
   color: var(--mantine-color-text, #ffffff) !important;
 }
 
+/* Simulateur ouvert : l'onglet natif sélectionné et son indicateur glissant ne doivent plus être surlignés,
+   sinon deux onglets (voire plus) apparaissent sélectionnés en même temps. */
+.myepitech-gpa-tabs-active > div {
+  opacity: 0 !important;
+}
+
+.myepitech-gpa-tabs-active > button:not(.myepitech-gpa-nav-btn) {
+  background: transparent !important;
+  border-bottom-color: transparent !important;
+  color: var(--mantine-color-dimmed, #8b949e) !important;
+}
+
 /* Panneau principal du simulateur (Design Mantine / MyEpitech) */
 .myepitech-gpa-simulator-panel {
   background: var(--mantine-color-body, #1a1b1e);
@@ -619,6 +631,42 @@ body.myepitech-hide-user-name header button[aria-haspopup="menu"] > span:not(.ma
   font-size: 12px;
   color: var(--mantine-color-dimmed, #909296);
   margin-top: 2px;
+}
+
+/* Codes des modules rattachés à l'UE (liens vers la fiche du module) */
+.myepitech-gpa-module-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.myepitech-module-chip {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: var(--mantine-radius-sm, 4px);
+  border: 1px solid rgba(77, 171, 247, 0.4);
+  background: rgba(51, 154, 240, 0.12);
+  color: var(--mantine-color-blue-4, #4dabf7);
+  font-size: 11px;
+  line-height: 1.6;
+  text-decoration: none;
+}
+
+.myepitech-module-chip strong {
+  font-family: var(--mantine-font-family-monospace, monospace);
+  margin-right: 4px;
+}
+
+a.myepitech-module-chip:hover {
+  background: rgba(51, 154, 240, 0.25);
+  text-decoration: underline;
+}
+
+.myepitech-gpa-module-none {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--mantine-color-dimmed, #909296);
 }
 
 .myepitech-ects-badge {
